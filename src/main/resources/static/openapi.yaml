@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
   title: website
   version: current
@@ -11,6 +11,126 @@ paths:
   /ping:
     get:
       summary: Returns pong
+      tags:
+        - healthcheck
       responses:
         200:
           description: OK
+        default:
+          description: Something went wrong
+  /backup/:
+    get:
+      summary: Get list of records
+      tags:
+        - backup
+      responses:
+        200:
+          description: OK
+        default:
+          description: Something went wrong
+    post:
+      summary: Create a new record
+      tags:
+        - backup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              identifier: my-backup
+              freshForHours: 28
+      responses:
+        201:
+          description: Created
+        default:
+          description: Something went wrong
+  /backup/{identifier}:
+    get:
+      summary: Show the record
+      tags:
+        - backup
+      parameters:
+        - in: path
+          name: identifier
+          example: my-backup
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: OK
+        default:
+          description: Something went wrong
+    put:
+      summary: Update the record
+      tags:
+        - backup
+      parameters:
+        - in: path
+          name: identifier
+          example: my-backup
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              freshForHours: 28
+      responses:
+        204:
+          description: Updated
+        default:
+          description: Something went wrong
+    delete:
+      summary: Delete the record
+      tags:
+        - backup
+      parameters:
+        - in: path
+          name: identifier
+          example: my-backup
+          schema:
+            type: string
+          required: true
+      responses:
+        204:
+          description: Deleted
+        default:
+          description: Something went wrong
+  /backup/{identifier}/freshness:
+    get:
+      summary: Check the record freshness
+      tags:
+        - backup
+      parameters:
+        - in: path
+          name: identifier
+          example: my-backup
+          schema:
+            type: string
+          required: true
+      responses:
+        204:
+          description: Fresh
+        500:
+          description: Not fresh
+        default:
+          description: Something went wrong
+    put:
+      summary: Refresh the record
+      tags:
+        - backup
+      parameters:
+        - in: path
+          name: identifier
+          example: my-backup
+          schema:
+            type: string
+          required: true
+      responses:
+        204:
+          description: Refreshed
+        default:
+          description: Something went wrong
