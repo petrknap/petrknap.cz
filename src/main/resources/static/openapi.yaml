@@ -1,0 +1,16 @@
+openapi: 3.0.0
+info:
+  title: website
+  version: current
+
+servers:
+  - url: http://127.0.0.1:8080/
+    description: development
+
+paths:
+  /ping:
+    get:
+      summary: Returns pong
+      responses:
+        200:
+          description: OK
