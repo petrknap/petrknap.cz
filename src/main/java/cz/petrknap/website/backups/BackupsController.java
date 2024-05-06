@@ -1,4 +1,4 @@
-package cz.petrknap.website.backup;
+package cz.petrknap.website.backups;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/backup")
-public class BackupController {
+@RequestMapping("/backups")
+public class BackupsController {
     @Autowired
     private MetadataRepository repository;
 

@@ -1,4 +1,4 @@
-package cz.petrknap.website.backup;
+package cz.petrknap.website.backups;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -1,4 +1,4 @@
-package cz.petrknap.website.backup;
+package cz.petrknap.website.backups;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class BackupTests {
+public class BackupsTests {
     @Autowired
     private MockMvc mvc;
     @Autowired

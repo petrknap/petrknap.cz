@@ -1,4 +1,4 @@
-package cz.petrknap.website.backup;
+package cz.petrknap.website.backups;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
