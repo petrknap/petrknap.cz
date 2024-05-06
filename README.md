@@ -6,9 +6,9 @@ Feel free to visit it at <https://petrknap.cz>.
 
 Simple API that monitors the freshness of backups.
 
-## [Swagger UI](http://127.0.0.1:8080/swagger/index.html)
+## [Swagger UI](http://127.0.0.1:8080/swagger-ui.html)
 
-Please, [download `swagger-api/swagger-ui`](https://github.com/swagger-api/swagger-ui/releases) and copy content of `dist` to `src/main/resources/static/swagger`.
+Substitute for the backend.
 
 ---
 
