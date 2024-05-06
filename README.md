@@ -2,7 +2,7 @@
 
 Feel free to visit it at <https://petrknap.cz>.
 
-## [Backup](http://127.0.0.1:8080/backup/)
+## [Backups](http://127.0.0.1:8080/backups/)
 
 Simple API that monitors the freshness of backups.
 
