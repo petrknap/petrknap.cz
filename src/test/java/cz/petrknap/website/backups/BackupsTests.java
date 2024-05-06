@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class BackupsTests {
+class BackupsTests {
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -32,14 +32,14 @@ public class BackupsTests {
     }
 
     @Test
-    public void listsMetadata() throws Exception {
+    void listsMetadata() throws Exception {
         mvc.perform(get("/backups/"))
                 .andExpect(status().isOk())
         ;
     }
 
     @Test
-    public void createsMetadata() throws Exception {
+    void createsMetadata() throws Exception {
         repository.deleteById(BACKUP_IDENTIFIER);
 
         mvc.perform(post("/backups/")
@@ -52,7 +52,7 @@ public class BackupsTests {
     }
 
     @Test
-    public void showsMetadata() throws Exception {
+    void showsMetadata() throws Exception {
         mvc.perform(get("/backups/" + BACKUP_IDENTIFIER))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("\"identifier\":\"" + BACKUP_IDENTIFIER + "\"")))
@@ -61,7 +61,7 @@ public class BackupsTests {
     }
 
     @Test
-    public void updatesMetadata() throws Exception {
+    void updatesMetadata() throws Exception {
         mvc.perform(put("/backups/" + BACKUP_IDENTIFIER)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"freshForHours\":" + (BACKUP_FRESH_FOR_HOURS + 1) + "}")
@@ -73,7 +73,7 @@ public class BackupsTests {
     }
 
     @Test
-    public void deletesMetadata() throws Exception {
+    void deletesMetadata() throws Exception {
         mvc.perform(delete("/backups/" + BACKUP_IDENTIFIER))
                 .andExpect(status().isNoContent())
         ;
@@ -82,7 +82,7 @@ public class BackupsTests {
     }
 
     @Test
-    public void checksMetadataFreshness() throws Exception {
+    void checksMetadataFreshness() throws Exception {
         mvc.perform(get("/backups/" + BACKUP_IDENTIFIER + "/freshness"))
                 .andExpect(status().isInternalServerError())
         ;
@@ -97,7 +97,7 @@ public class BackupsTests {
     }
 
     @Test
-    public void refreshesMetadata() throws Exception {
+    void refreshesMetadata() throws Exception {
         mvc.perform(put("/backups/" + BACKUP_IDENTIFIER + "/freshness"))
                 .andExpect(status().isNoContent())
         ;
