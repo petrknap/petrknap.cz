@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +15,7 @@ public class Metadata {
     private String identifier;
     private LocalDateTime refreshedAt;
     @Column(nullable = false)
+    @Min(1)
     private Integer freshForHours;
 
     protected Metadata() {
@@ -22,6 +24,10 @@ public class Metadata {
     public Metadata(String identifier, Integer freshForHours) {
         this.identifier = identifier;
         setFreshForHours(freshForHours);
+    }
+
+    public String getId() {
+        return getIdentifier();
     }
 
     public String getIdentifier() {
@@ -33,7 +39,7 @@ public class Metadata {
     }
 
     public void setFreshForHours(Integer freshForHours) {
-        this.freshForHours = Math.max(1, freshForHours);
+        this.freshForHours = freshForHours;
     }
 
     public Integer getFreshForHours() {

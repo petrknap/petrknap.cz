@@ -1,24 +1,23 @@
 package cz.petrknap.website.backups;
 
+import cz.petrknap.website.JpaCrudControllerTests;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class BackupsTests {
-    @Autowired
-    private MockMvc mvc;
+class BackupsTests extends JpaCrudControllerTests<Metadata, String> {
     @Autowired
     private MetadataRepository repository;
 
@@ -26,63 +25,13 @@ class BackupsTests {
     private static final Integer BACKUP_FRESH_FOR_HOURS = 123;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         repository.deleteById(BACKUP_IDENTIFIER);
         repository.save(new Metadata(BACKUP_IDENTIFIER, BACKUP_FRESH_FOR_HOURS));
     }
 
     @Test
-    void listsMetadata() throws Exception {
-        mvc.perform(get("/backups/"))
-                .andExpect(status().isOk())
-        ;
-    }
-
-    @Test
-    void createsMetadata() throws Exception {
-        repository.deleteById(BACKUP_IDENTIFIER);
-
-        mvc.perform(post("/backups/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"identifier\":\"" + BACKUP_IDENTIFIER + "\",\"freshForHours\":" + BACKUP_FRESH_FOR_HOURS + "}")
-                )
-                .andExpect(status().isCreated())
-                .andExpect(header().string(HttpHeaders.LOCATION, containsString(BACKUP_IDENTIFIER)))
-        ;
-    }
-
-    @Test
-    void showsMetadata() throws Exception {
-        mvc.perform(get("/backups/" + BACKUP_IDENTIFIER))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("\"identifier\":\"" + BACKUP_IDENTIFIER + "\"")))
-                .andExpect(content().string(containsString("\"freshForHours\":" + BACKUP_FRESH_FOR_HOURS)))
-        ;
-    }
-
-    @Test
-    void updatesMetadata() throws Exception {
-        mvc.perform(put("/backups/" + BACKUP_IDENTIFIER)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"freshForHours\":" + (BACKUP_FRESH_FOR_HOURS + 1) + "}")
-                )
-                .andExpect(status().isNoContent())
-        ;
-
-        assertThat(repository.findByIdentifier(BACKUP_IDENTIFIER).orElseThrow().getFreshForHours()).isEqualTo(BACKUP_FRESH_FOR_HOURS + 1);
-    }
-
-    @Test
-    void deletesMetadata() throws Exception {
-        mvc.perform(delete("/backups/" + BACKUP_IDENTIFIER))
-                .andExpect(status().isNoContent())
-        ;
-
-        assertThat(repository.findById(BACKUP_IDENTIFIER)).isEmpty();
-    }
-
-    @Test
-    void checksMetadataFreshness() throws Exception {
+    void checksFreshness() throws Exception {
         mvc.perform(get("/backups/" + BACKUP_IDENTIFIER + "/freshness"))
                 .andExpect(status().isInternalServerError())
         ;
@@ -97,11 +46,41 @@ class BackupsTests {
     }
 
     @Test
-    void refreshesMetadata() throws Exception {
+    void refreshes() throws Exception {
         mvc.perform(put("/backups/" + BACKUP_IDENTIFIER + "/freshness"))
                 .andExpect(status().isNoContent())
         ;
 
         assertThat(repository.findByIdentifier(BACKUP_IDENTIFIER).orElseThrow().isFresh()).isTrue();
+    }
+
+    @Override
+    protected MetadataRepository getRepository() {
+        return repository;
+    }
+
+    @Override
+    protected String getRequestMapping() {
+        return "/backups";
+    }
+
+    @Override
+    protected String getEntityId() {
+        return BACKUP_IDENTIFIER;
+    }
+
+    @Override
+    protected Map<String, String> getCreateBodyAsKeyToRawValue() {
+        return new HashMap<>() {{
+            put("identifier", "\"" + BACKUP_IDENTIFIER + "\"");
+            put("freshForHours", BACKUP_FRESH_FOR_HOURS.toString());
+        }};
+    }
+
+    @Override
+    protected Map<String, String> getUpdateBodyAsKeyToRawValue() {
+        return new HashMap<>() {{
+            put("freshForHours", BACKUP_FRESH_FOR_HOURS + "1");
+        }};
     }
 }
