@@ -7,5 +7,5 @@ import java.util.Optional;
 
 @Repository
 public interface MetadataRepository extends JpaRepository<Metadata, String> {
-    public Optional<Metadata> findByIdentifier(String identifier);
+    Optional<Metadata> findByIdentifier(String identifier);
 }

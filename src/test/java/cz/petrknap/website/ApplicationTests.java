@@ -13,12 +13,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ApplicationTests {
+class ApplicationTests {
     @Autowired
     private MockMvc mvc;
 
     @Test
-    public void pingReturnsPong() throws Exception {
+    void pingReturnsPong() throws Exception {
         mvc.perform(get("/ping"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("pong")))

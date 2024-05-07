@@ -6,8 +6,6 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +17,11 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/backups")
 public class BackupsController {
-    @Autowired
-    private MetadataRepository repository;
+    private final MetadataRepository repository;
+
+    public BackupsController(MetadataRepository repository) {
+        this.repository = repository;
+    }
 
     @Operation(summary = "List metadata")
     @GetMapping("/")
@@ -31,12 +32,10 @@ public class BackupsController {
     @Operation(summary = "Create a metadata")
     @PostMapping("/")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = {@Content(examples = {@ExampleObject(value = "{\"identifier\": \"my-backup\", \"freshForHours\": 28}")})})
-    @ApiResponses({
-            @ApiResponse(responseCode = "400", content = {@Content}),
-            @ApiResponse(responseCode = "409", content = {@Content}),
-            @ApiResponse(responseCode = "201", content = {@Content}, headers = {@Header(name = HttpHeaders.LOCATION, description = "Relative link to the created metadata")}),
-    })
-    public ResponseEntity<?> create(@RequestBody Metadata requested) {
+    @ApiResponse(responseCode = "201", headers = {@Header(name = HttpHeaders.LOCATION, description = "Relative link to the created metadata")})
+    @ApiResponse(responseCode = "400")
+    @ApiResponse(responseCode = "409")
+    public ResponseEntity<Void> create(@RequestBody Metadata requested) {
         String identifier = requested.getIdentifier();
         Integer freshForHours = requested.getFreshForHours();
 
@@ -57,10 +56,8 @@ public class BackupsController {
     @Operation(summary = "Show the metadata")
     @GetMapping("/{identifier}")
     @Parameter(name = "identifier", content = {@Content(mediaType = "plain/text")}, example = "my-backup")
-    @ApiResponses({
-            @ApiResponse(responseCode = "404", content = {@Content}),
-            @ApiResponse(responseCode = "200"),
-    })
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", content = {@Content})
     public Metadata show(@PathVariable("identifier") Metadata backup) {
         return backup;
     }
@@ -69,12 +66,10 @@ public class BackupsController {
     @PutMapping("/{identifier}")
     @Parameter(name = "identifier", content = {@Content(mediaType = "plain/text")}, example = "my-backup")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = {@Content(examples = {@ExampleObject(value = "{\"freshForHours\": 28}")})})
-    @ApiResponses({
-            @ApiResponse(responseCode = "400", content = {@Content}),
-            @ApiResponse(responseCode = "404", content = {@Content}),
-            @ApiResponse(responseCode = "204", content = {@Content}, description = "Updated"),
-    })
-    public ResponseEntity<?> update(@PathVariable("identifier") Metadata backup, @RequestBody Metadata requested) {
+    @ApiResponse(responseCode = "204", description = "Updated")
+    @ApiResponse(responseCode = "400")
+    @ApiResponse(responseCode = "404")
+    public ResponseEntity<Void> update(@PathVariable("identifier") Metadata backup, @RequestBody Metadata requested) {
         backup.setFreshForHours(requested.getFreshForHours());
         repository.save(backup);
 
@@ -84,11 +79,9 @@ public class BackupsController {
     @Operation(summary = "Delete the metadata")
     @DeleteMapping("/{identifier}")
     @Parameter(name = "identifier", content = {@Content(mediaType = "plain/text")}, example = "my-backup")
-    @ApiResponses({
-            @ApiResponse(responseCode = "404", content = {@Content()}),
-            @ApiResponse(responseCode = "204", content = {@Content()}, description = "Deleted"),
-    })
-    public ResponseEntity<?> delete(@PathVariable("identifier") Metadata backup) {
+    @ApiResponse(responseCode = "204", description = "Deleted")
+    @ApiResponse(responseCode = "404")
+    public ResponseEntity<Void> delete(@PathVariable("identifier") Metadata backup) {
         repository.delete(backup);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
@@ -97,23 +90,19 @@ public class BackupsController {
     @Operation(summary = "Check the metadata freshness")
     @GetMapping("/{identifier}/freshness")
     @Parameter(name = "identifier", content = {@Content(mediaType = "plain/text")}, example = "my-backup")
-    @ApiResponses({
-            @ApiResponse(responseCode = "404", content = {@Content()}),
-            @ApiResponse(responseCode = "500", content = {@Content()}, description = "Not Fresh"),
-            @ApiResponse(responseCode = "204", content = {@Content()}, description = "Fresh"),
-    })
-    public ResponseEntity<?> checkFreshness(@PathVariable("identifier") Metadata backup) {
+    @ApiResponse(responseCode = "204", description = "Fresh")
+    @ApiResponse(responseCode = "404")
+    @ApiResponse(responseCode = "500", description = "Not Fresh")
+    public ResponseEntity<Void> checkFreshness(@PathVariable("identifier") Metadata backup) {
         return ResponseEntity.status(backup.isFresh() ? HttpStatus.NO_CONTENT : HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
 
     @Operation(summary = "Refresh the metadata")
     @PutMapping("/{identifier}/freshness")
     @Parameter(name = "identifier", content = {@Content(mediaType = "plain/text")}, example = "my-backup")
-    @ApiResponses({
-            @ApiResponse(responseCode = "404", content = {@Content()}),
-            @ApiResponse(responseCode = "204", content = {@Content()}, description = "Refreshed"),
-    })
-    public ResponseEntity<?> refresh(@PathVariable("identifier") Metadata backup) {
+    @ApiResponse(responseCode = "204", description = "Refreshed")
+    @ApiResponse(responseCode = "404")
+    public ResponseEntity<Void> refresh(@PathVariable("identifier") Metadata backup) {
         backup.refresh();
         repository.save(backup);
 
