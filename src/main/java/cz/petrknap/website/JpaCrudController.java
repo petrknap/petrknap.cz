@@ -76,10 +76,6 @@ public abstract class JpaCrudController<T, ID> {
         return ResponseEntity.noContent().build();
     }
 
-    protected T getEntityById(ID id) throws ResponseStatusException {
-        return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-    }
-
     protected void throwConflictIfPresent(Optional<T> entity) throws ResponseStatusException {
         if (entity.isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
@@ -88,4 +84,8 @@ public abstract class JpaCrudController<T, ID> {
 
     protected abstract ID doCreate(T requested) throws Exception;
     protected abstract T doUpdate(T actual, T requested) throws Exception;
+
+    private T getEntityById(ID id) throws ResponseStatusException {
+        return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
 }
