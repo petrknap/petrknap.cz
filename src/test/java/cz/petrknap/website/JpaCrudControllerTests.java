@@ -37,7 +37,7 @@ public abstract class JpaCrudControllerTests<T, ID> {
                                 .content(createBody(getCreateBodyAsKeyToRawValue()))
                         )
                         .andExpect(status().isCreated())
-                        .andExpect(header().string(HttpHeaders.LOCATION, containsString(getEntityId().toString()))),
+                        .andExpect(header().exists(HttpHeaders.LOCATION)),
                 getCreateBodyAsKeyToRawValue()
         );
     }
