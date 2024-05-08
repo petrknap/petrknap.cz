@@ -3,12 +3,14 @@ package cz.petrknap.website.backups;
 import cz.petrknap.website.JpaCrudController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/backups")
+@Tag(name = "backups")
 public class BackupsController extends JpaCrudController<Metadata, String> {
     private final MetadataRepository metadataRepository;
 
@@ -42,16 +44,18 @@ public class BackupsController extends JpaCrudController<Metadata, String> {
     @Override
     protected String doCreate(Metadata requested) {
         String identifier = requested.getIdentifier();
-        Integer freshForHours = requested.getFreshForHours();
 
         throwConflictIfPresent(metadataRepository.findByIdentifier(identifier));
 
-        return metadataRepository.save(new Metadata(identifier, freshForHours)).getIdentifier();
+        return metadataRepository.save(new Metadata(identifier, requested.getFreshForHours())).getId();
     }
 
     @Override
     protected Metadata doUpdate(Metadata actual, Metadata requested) {
-        actual.setFreshForHours(requested.getFreshForHours());
+        Integer freshForHours = requested.getFreshForHours();
+        if (freshForHours != null) {
+            actual.setFreshForHours(freshForHours);
+        }
 
         return metadataRepository.save(actual);
     }
