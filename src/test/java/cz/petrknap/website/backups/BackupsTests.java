@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,14 +21,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BackupsTests extends JpaCrudControllerTests<Metadata, String> {
     @Autowired
     private MetadataRepository repository;
+    private String entityId;
 
     private static final String BACKUP_IDENTIFIER = "test-backup";
     private static final Integer BACKUP_FRESH_FOR_HOURS = 123;
 
     @BeforeEach
     void setUp() {
-        repository.deleteById(BACKUP_IDENTIFIER);
-        repository.save(new Metadata(BACKUP_IDENTIFIER, BACKUP_FRESH_FOR_HOURS));
+        Optional<Metadata> optionalMetadata = repository.findByIdentifier(BACKUP_IDENTIFIER);
+        optionalMetadata.ifPresent(metadata -> repository.delete(metadata));
+        entityId = repository.save(new Metadata(BACKUP_IDENTIFIER, BACKUP_FRESH_FOR_HOURS)).getId();
     }
 
     @Test
@@ -66,7 +69,7 @@ class BackupsTests extends JpaCrudControllerTests<Metadata, String> {
 
     @Override
     protected String getEntityId() {
-        return BACKUP_IDENTIFIER;
+        return entityId;
     }
 
     @Override
