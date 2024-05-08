@@ -1,17 +1,18 @@
 package cz.petrknap.website.backups;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "backups")
 public class Metadata {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    @Column(unique = true, nullable = false)
     private String identifier;
     private LocalDateTime refreshedAt;
     @Column(nullable = false)
@@ -26,8 +27,8 @@ public class Metadata {
         setFreshForHours(freshForHours);
     }
 
-    public String getId() {
-        return getIdentifier();
+    public UUID getId() {
+        return id;
     }
 
     public String getIdentifier() {

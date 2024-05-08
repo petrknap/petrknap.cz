@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -18,10 +19,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class BackupsTests extends JpaCrudControllerTests<Metadata, String> {
+class BackupsTests extends JpaCrudControllerTests<Metadata, UUID> {
     @Autowired
     private MetadataRepository repository;
-    private String entityId;
+    private UUID entityId;
 
     private static final String BACKUP_IDENTIFIER = "test-backup";
     private static final Integer BACKUP_FRESH_FOR_HOURS = 123;
@@ -35,22 +36,22 @@ class BackupsTests extends JpaCrudControllerTests<Metadata, String> {
 
     @Test
     void checksFreshness() throws Exception {
-        mvc.perform(get("/backups/" + BACKUP_IDENTIFIER + "/freshness"))
+        mvc.perform(get(BackupsController.MAPPING + "/" + BACKUP_IDENTIFIER + "/freshness"))
                 .andExpect(status().isInternalServerError())
         ;
 
-        Metadata backup = repository.findById(BACKUP_IDENTIFIER).orElseThrow();
+        Metadata backup = repository.findById(entityId).orElseThrow();
         backup.refresh();
         repository.save(backup);
 
-        mvc.perform(get("/backups/" + BACKUP_IDENTIFIER + "/freshness"))
+        mvc.perform(get(BackupsController.MAPPING + "/" + BACKUP_IDENTIFIER + "/freshness"))
                 .andExpect(status().isNoContent())
         ;
     }
 
     @Test
     void refreshes() throws Exception {
-        mvc.perform(put("/backups/" + BACKUP_IDENTIFIER + "/freshness"))
+        mvc.perform(put(BackupsController.MAPPING + "/" + BACKUP_IDENTIFIER + "/freshness"))
                 .andExpect(status().isNoContent())
         ;
 
@@ -64,11 +65,11 @@ class BackupsTests extends JpaCrudControllerTests<Metadata, String> {
 
     @Override
     protected String getRequestMapping() {
-        return "/backups";
+        return BackupsController.MAPPING;
     }
 
     @Override
-    protected String getEntityId() {
+    protected UUID getEntityId() {
         return entityId;
     }
 

@@ -7,11 +7,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/backups")
+@RequestMapping(BackupsController.MAPPING)
 @Tag(name = "backups")
-public class BackupsController extends JpaCrudController<Metadata, String> {
+public class BackupsController extends JpaCrudController<Metadata, UUID> {
+    public static final String MAPPING = "/backups";
+
     private final MetadataRepository metadataRepository;
 
     public BackupsController(MetadataRepository repository) {
@@ -19,22 +24,25 @@ public class BackupsController extends JpaCrudController<Metadata, String> {
     }
 
     @Operation(summary = "Check freshness")
-    @GetMapping("/{id}/freshness")
+    @GetMapping("/{identifier}/freshness")
     @ApiResponse(responseCode = "204", description = "Fresh")
     @ApiResponse(responseCode = "404")
     @ApiResponse(responseCode = "500", description = "Not Fresh")
-    public ResponseEntity<Void> checkFreshness(@PathVariable String id) {
+    public ResponseEntity<Void> checkFreshness(@PathVariable String identifier) {
+        Metadata backup = metadataRepository.findByIdentifier(identifier).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
         return ResponseEntity
-                .status(getEntityById(id).isFresh() ? HttpStatus.NO_CONTENT : HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(backup.isFresh() ? HttpStatus.NO_CONTENT : HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
     }
 
     @Operation(summary = "Refresh")
-    @PutMapping("/{id}/freshness")
+    @PutMapping("/{identifier}/freshness")
     @ApiResponse(responseCode = "204", description = "Refreshed")
     @ApiResponse(responseCode = "404")
-    public ResponseEntity<Void> refresh(@PathVariable String id) {
-        Metadata backup = getEntityById(id);
+    public ResponseEntity<Void> refresh(@PathVariable String identifier) {
+        Metadata backup = metadataRepository.findByIdentifier(identifier).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
         backup.refresh();
         metadataRepository.save(backup);
 
@@ -42,7 +50,7 @@ public class BackupsController extends JpaCrudController<Metadata, String> {
     }
 
     @Override
-    protected String doCreate(Metadata requested) {
+    protected UUID doCreate(Metadata requested) {
         String identifier = requested.getIdentifier();
 
         throwConflictIfPresent(metadataRepository.findByIdentifier(identifier));
