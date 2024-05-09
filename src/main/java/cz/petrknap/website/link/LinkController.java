@@ -23,7 +23,7 @@ public class LinkController extends JpaCrudController<Link, UUID> {
 
         throwConflictIfPresent(linkRepository.findBySlug(slug));
 
-        return linkRepository.save(new Link(slug, requested.getUrl(), requested.isForward())).getId();
+        return linkRepository.save(new Link(slug, requested.getLocation(), requested.isForward())).getId();
     }
 
     protected Link doUpdate(Link actual, Link requested) {
@@ -32,14 +32,14 @@ public class LinkController extends JpaCrudController<Link, UUID> {
             actual.setSlug(slug);
         }
 
-        String url = requested.getUrl();
-        if (url != null) {
-            actual.setUrl(requested.getUrl());
+        String location = requested.getLocation();
+        if (location != null) {
+            actual.setLocation(location);
         }
 
         Boolean forward = requested.getForward();
         if (forward != null) {
-            actual.setForward(requested.getForward());
+            actual.setForward(forward);
         }
 
         return linkRepository.save(actual);

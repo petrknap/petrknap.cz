@@ -13,16 +13,16 @@ public class Link {
     @Column(unique=true, nullable = false)
     private String slug;
     @Column(nullable = false)
-    private String url;
+    private String location;
     @Column(nullable = false)
     private Boolean forward;
 
     protected Link() {
     }
 
-    public Link(String slug, String url, Boolean forward) {
+    public Link(String slug, String location, Boolean forward) {
         setSlug(slug);
-        setUrl(url);
+        setLocation(location);
         setForward(forward);
     }
 
@@ -38,12 +38,12 @@ public class Link {
         this.slug = slug;
     }
 
-    public String getUrl() {
-        return url;
+    public String getLocation() {
+        return location;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public boolean isForward()
