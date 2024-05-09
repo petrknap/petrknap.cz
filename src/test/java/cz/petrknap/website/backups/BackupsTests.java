@@ -23,7 +23,7 @@ class BackupsTests extends JpaCrudControllerTests<Metadata, String> {
     private MetadataRepository repository;
     private String entityId;
 
-    private static final String BACKUP_IDENTIFIER = "test-backup";
+    private static final String BACKUP_IDENTIFIER = "test";
     private static final Integer BACKUP_FRESH_FOR_HOURS = 123;
 
     @BeforeEach
@@ -35,22 +35,22 @@ class BackupsTests extends JpaCrudControllerTests<Metadata, String> {
 
     @Test
     void checksFreshness() throws Exception {
-        mvc.perform(get("/backups/" + BACKUP_IDENTIFIER + "/freshness"))
+        mvc.perform(get(BackupsController.MAPPING + "/" + entityId + "/freshness"))
                 .andExpect(status().isInternalServerError())
         ;
 
-        Metadata backup = repository.findById(BACKUP_IDENTIFIER).orElseThrow();
+        Metadata backup = repository.findById(entityId).orElseThrow();
         backup.refresh();
         repository.save(backup);
 
-        mvc.perform(get("/backups/" + BACKUP_IDENTIFIER + "/freshness"))
+        mvc.perform(get(BackupsController.MAPPING + "/" + entityId + "/freshness"))
                 .andExpect(status().isNoContent())
         ;
     }
 
     @Test
     void refreshes() throws Exception {
-        mvc.perform(put("/backups/" + BACKUP_IDENTIFIER + "/freshness"))
+        mvc.perform(put(BackupsController.MAPPING + "/" + entityId + "/freshness"))
                 .andExpect(status().isNoContent())
         ;
 
@@ -64,7 +64,7 @@ class BackupsTests extends JpaCrudControllerTests<Metadata, String> {
 
     @Override
     protected String getRequestMapping() {
-        return "/backups";
+        return BackupsController.MAPPING;
     }
 
     @Override

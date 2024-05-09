@@ -24,7 +24,7 @@ class LinkTests extends JpaCrudControllerTests<Link, UUID> {
     private LinkRepository repository;
     private UUID entityId;
 
-    private static final String LINK_SLUG = "test-slug";
+    private static final String LINK_SLUG = "test";
     private static final String LINK_LOCATION = "http://example.com";
     private static final Boolean LINK_FORWARD = false;
 

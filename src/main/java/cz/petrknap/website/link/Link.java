@@ -8,9 +8,9 @@ import java.util.UUID;
 @Table(name = "links")
 public class Link {
     @Id
-    @GeneratedValue(strategy=GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @Column(unique=true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String slug;
     @Column(nullable = false)
     private String location;
