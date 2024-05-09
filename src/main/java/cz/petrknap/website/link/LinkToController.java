@@ -24,9 +24,13 @@ public class LinkToController {
         Link link = linkRepository.findBySlug(slug).orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND));
 
         if (link.isForward()) {
-            return "forward:" + MAPPING + "-forwardable/" + link.getUrl();
+            String location = link.getLocation();
+            if (!location.startsWith(MAPPING + "-forwardable/")) {
+                throw new ErrorResponseException(HttpStatus.FORBIDDEN);
+            }
+            return "forward:" + location;
         } else {
-            return "redirect:" + link.getUrl();
+            return "redirect:" + link.getLocation();
         }
     }
 }
