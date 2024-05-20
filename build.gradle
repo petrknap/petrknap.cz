@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'cz.petrknap'
-version = '0.0.1-SNAPSHOT'
+version = (new Date()).format('yyyy.MM.dd') + '-' + 'git rev-parse --short HEAD'.execute().text.trim()
 
 java {
     sourceCompatibility = '21'
