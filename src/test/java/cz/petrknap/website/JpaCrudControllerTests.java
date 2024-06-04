@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -20,6 +21,7 @@ public abstract class JpaCrudControllerTests<T, ID> {
     protected MockMvc mvc;
 
     @Test
+    @WithMockUser
     public void lists() throws Exception {
         mvc.perform(get(getRequestMapping() + "/"))
                 .andExpect(status().isOk())
@@ -28,6 +30,7 @@ public abstract class JpaCrudControllerTests<T, ID> {
     }
 
     @Test
+    @WithMockUser
     public void creates() throws Exception {
         getRepository().deleteById(getEntityId());
 
@@ -43,6 +46,7 @@ public abstract class JpaCrudControllerTests<T, ID> {
     }
 
     @Test
+    @WithMockUser
     public void shows() throws Exception {
         addExpects(
                 mvc.perform(get(getRequestMapping() + "/" + getEntityId()))
@@ -52,6 +56,7 @@ public abstract class JpaCrudControllerTests<T, ID> {
     }
 
     @Test
+    @WithMockUser
     public void updates() throws Exception {
         addExpects(
             mvc.perform(put(getRequestMapping() + "/" + getEntityId())
@@ -64,6 +69,7 @@ public abstract class JpaCrudControllerTests<T, ID> {
     }
 
     @Test
+    @WithMockUser
     public void deletes() throws Exception {
         mvc.perform(delete(getRequestMapping() + "/" + getEntityId()))
                 .andExpect(status().isNoContent())
