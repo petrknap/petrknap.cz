@@ -1,4 +1,6 @@
 package cz.petrknap.website;
 
-public record User(String username, String password, String role) {
+import java.util.List;
+
+public record User(String username, String password, List<String> roles) {
 }
