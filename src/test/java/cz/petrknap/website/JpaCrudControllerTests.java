@@ -21,7 +21,7 @@ public abstract class JpaCrudControllerTests<T, ID> {
     protected MockMvc mvc;
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = {"ADMIN"})
     public void lists() throws Exception {
         mvc.perform(get(getRequestMapping() + "/"))
                 .andExpect(status().isOk())
@@ -30,7 +30,7 @@ public abstract class JpaCrudControllerTests<T, ID> {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = {"ADMIN"})
     public void creates() throws Exception {
         getRepository().deleteById(getEntityId());
 
@@ -46,7 +46,7 @@ public abstract class JpaCrudControllerTests<T, ID> {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = {"ADMIN"})
     public void shows() throws Exception {
         addExpects(
                 mvc.perform(get(getRequestMapping() + "/" + getEntityId()))
@@ -56,7 +56,7 @@ public abstract class JpaCrudControllerTests<T, ID> {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = {"ADMIN"})
     public void updates() throws Exception {
         addExpects(
             mvc.perform(put(getRequestMapping() + "/" + getEntityId())
@@ -69,7 +69,7 @@ public abstract class JpaCrudControllerTests<T, ID> {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = {"ADMIN"})
     public void deletes() throws Exception {
         mvc.perform(delete(getRequestMapping() + "/" + getEntityId()))
                 .andExpect(status().isNoContent())

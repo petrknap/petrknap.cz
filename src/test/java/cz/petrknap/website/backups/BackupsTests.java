@@ -50,7 +50,7 @@ class BackupsTests extends JpaCrudControllerTests<Metadata, String> {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = {"USER"})
     void refreshes() throws Exception {
         mvc.perform(put(BackupsController.MAPPING + "/" + entityId + "/freshness"))
                 .andExpect(status().isNoContent())
