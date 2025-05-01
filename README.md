@@ -2,17 +2,14 @@
 
 Feel free to visit it at <https://petrknap.cz>.
 
-## [Backups](http://127.0.0.1:8080/backups/)
-
-Simple API that monitors the freshness of backups.
-
-## [Link](http://127.0.0.1:8080/link/)
-
-URL shortening service.
-
-## [Swagger UI](http://127.0.0.1:8080/swagger-ui.html)
-
-Substitute for the backend.
+- [backups](http://127.0.0.1:8080/backups/),
+  simple API that monitors the freshness of backups
+- [link](http://127.0.0.1:8080/link/),
+  URL shortening service
+- [www](http://127.0.0.1:8080/www/),
+  proxy to the majestic frontend
+- [Swagger UI](http://127.0.0.1:8080/swagger-ui.html),
+  substitute for the backend
 
 ---
 
