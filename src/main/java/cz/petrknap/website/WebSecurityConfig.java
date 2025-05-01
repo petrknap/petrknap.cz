@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collection;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -41,9 +41,10 @@ public class WebSecurityConfig {
                 requests -> requests
                         .requestMatchers("/error", "/ping").permitAll()
                         .requestMatchers(new AntPathRequestMatcher(BackupsController.MAPPING + "/*/freshness", HttpMethod.GET.name())).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher(BackupsController.MAPPING + "/*/freshness", HttpMethod.PUT.name())).hasRole("USER")
                         .requestMatchers(new AntPathRequestMatcher(LinkToController.MAPPING + "/**", HttpMethod.GET.name())).permitAll()
                         .requestMatchers(new AntPathRequestMatcher(WwwController.MAPPING + "/**", HttpMethod.GET.name())).permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().hasRole("ADMIN")
                 )
                 .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
@@ -53,18 +54,17 @@ public class WebSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        Collection<UserDetails> users = loadUsers().stream().map(user -> org.springframework.security.core.userdetails.User
+        return new InMemoryUserDetailsManager(loadUsers().stream().map(user -> org.springframework.security.core.userdetails.User
                 .withDefaultPasswordEncoder() // it uses static accounts with onetime passwords
                 .username(user.username())
                 .password(user.password())
-                .roles(user.role().toUpperCase())
+                .roles(user.roles().stream().map(String::toUpperCase).toArray(String[]::new))
                 .build()
-        ).toList();
-        return new InMemoryUserDetailsManager(users);
+        ).toArray(UserDetails[]::new));
     }
 
-    private Collection<User> loadUsers() {
-        Type usersList = new TypeToken<Collection<User>>(){}.getType();
+    private List<User> loadUsers() {
+        Type usersList = new TypeToken<List<User>>(){}.getType();
         String usersJson = "[]";
         try {
             usersJson = Files.readString(Paths.get(pathToUsersJsonFile));
