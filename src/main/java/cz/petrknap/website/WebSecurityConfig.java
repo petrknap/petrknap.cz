@@ -55,13 +55,13 @@ public class WebSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new InMemoryUserDetailsManager(loadUsers().stream().map(user -> org.springframework.security.core.userdetails.User
+        return new ThrottledUserDetailsService(new InMemoryUserDetailsManager(loadUsers().stream().map(user -> org.springframework.security.core.userdetails.User
                 .withDefaultPasswordEncoder() // it uses static accounts with onetime passwords
                 .username(user.username())
                 .password(user.password())
                 .roles(user.roles().stream().map(String::toUpperCase).toArray(String[]::new))
                 .build()
-        ).toArray(UserDetails[]::new));
+        ).toArray(UserDetails[]::new)));
     }
 
     private List<User> loadUsers() {
