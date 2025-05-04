@@ -1,0 +1,8 @@
+RewriteEngine On
+
+RewriteCond %{HTTP_HOST} !^[0-9\.]+$
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} !^petrknap\.cz$
+RewriteRule ^(.*)$ https://petrknap.cz/$1 [L,R=301]
+
+RewriteRule ^(.*)$ index.php?uri=$1 [L,QSA]
