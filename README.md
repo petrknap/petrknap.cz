@@ -6,8 +6,6 @@ Feel free to visit it at <https://petrknap.cz>.
   simple API that monitors the freshness of backups
 - [link](http://127.0.0.1:8080/link/),
   URL shortening service
-- [www](http://127.0.0.1:8080/www/),
-  proxy to the majestic frontend
 - [Swagger UI](http://127.0.0.1:8080/swagger-ui.html),
   substitute for the backend
 

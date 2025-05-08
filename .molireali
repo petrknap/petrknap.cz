@@ -1,3 +1,7 @@
 authors
-license GPL-3.0-or-later
+dockerfile php 7.3-apache
+docker-scripts petrknap/website
+github-workflow linter-docker
+github-workflow linter-php 7.3
 github-workflow gradle 21 corretto test
+license GPL-3.0-or-later
