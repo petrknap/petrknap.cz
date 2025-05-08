@@ -1,6 +1,6 @@
-# My personal web page
+# My personal website
 
-Feel free to visit it at <https://petrknap.cz>.
+Feel free to visit the majestic frontend at <https://petrknap.cz>.
 
 - [backups](http://127.0.0.1:8080/backups/),
   simple API that monitors the freshness of backups
