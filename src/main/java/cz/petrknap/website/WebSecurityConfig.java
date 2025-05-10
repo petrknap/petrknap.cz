@@ -9,6 +9,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -43,12 +44,12 @@ public class WebSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new ThrottledUserDetailsService(new InMemoryUserDetailsManager(config.users().stream().map(user -> org.springframework.security.core.userdetails.User
+        return new ThrottledUserDetailsService(new InMemoryUserDetailsManager(config.users().stream().map(user -> User
                 .withDefaultPasswordEncoder() // it uses static accounts with onetime passwords
                 .username(user.username())
                 .password(user.password())
                 .roles(user.roles().stream().map(String::toUpperCase).toArray(String[]::new))
                 .build()
-        ).toArray(UserDetails[]::new)));
+        ).toArray(UserDetails[]::new)), config);
     }
 }

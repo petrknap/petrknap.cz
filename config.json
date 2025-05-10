@@ -1,4 +1,9 @@
 {
+  "throttledUserDetailsService": {
+    "throttleAfterPermits": 3,
+    "releasePermitAfterMs": 1000,
+    "lockWhenDelayReachesMs": 60000
+  },
   "users": [
     {
       "username": "admin",

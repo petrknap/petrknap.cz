@@ -10,18 +10,17 @@ import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 
 public class ThrottledUserDetailsService implements UserDetailsService {
-    private static final int THROTTLE_AFTER_PERMITS = 3;
-    private static final int RELEASE_PERMIT_AFTER_MS = 1000 * THROTTLE_AFTER_PERMITS;
-    private static final int LOCK_WHEN_DELAY_REACHES_MS = 60000;
-    private static final int LOCK_AFTER_PERMITS = LOCK_WHEN_DELAY_REACHES_MS / (RELEASE_PERMIT_AFTER_MS / THROTTLE_AFTER_PERMITS);
-
     private final UserDetailsService userDetailsService;
-    private final Semaphore throttlingSemaphore = new Semaphore(THROTTLE_AFTER_PERMITS);
-    private final Semaphore lockingSemaphore = new Semaphore(LOCK_AFTER_PERMITS);
+    private final Config.ThrottledUserDetailsService config;
+    private final Semaphore throttlingSemaphore;
+    private final Semaphore lockingSemaphore;
     private final Timer timer = new Timer();
 
-    public ThrottledUserDetailsService(UserDetailsService userDetailsService) {
+    public ThrottledUserDetailsService(UserDetailsService userDetailsService, Config config) {
         this.userDetailsService = userDetailsService;
+        this.config = config.throttledUserDetailsService();
+        throttlingSemaphore = new Semaphore(this.config.throttleAfterPermits());
+        lockingSemaphore = new Semaphore(this.config.lockWhenDelayReachesMs() / this.config.releasePermitAfterMs());
     }
 
     @Override
@@ -37,7 +36,7 @@ public class ThrottledUserDetailsService implements UserDetailsService {
                     lockingSemaphore.release();
                     throttlingSemaphore.release();
                 }
-            }, RELEASE_PERMIT_AFTER_MS);
+            }, (long) this.config.releasePermitAfterMs() * this.config.throttleAfterPermits());
             return userDetailsService.loadUserByUsername(username);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
