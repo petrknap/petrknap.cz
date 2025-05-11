@@ -33,6 +33,7 @@ public class WebSecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher(BackupsController.MAPPING + "/*/freshness", HttpMethod.GET.name())).permitAll()
                         .requestMatchers(new AntPathRequestMatcher(BackupsController.MAPPING + "/*/freshness", HttpMethod.HEAD.name())).permitAll()
                         .requestMatchers(new AntPathRequestMatcher(BackupsController.MAPPING + "/*/freshness", HttpMethod.PUT.name())).hasRole("USER")
+                        .requestMatchers(new AntPathRequestMatcher(LinkToController.MAPPING + "-forwardable/**", HttpMethod.GET.name())).permitAll() // fake route to allow forwarding
                         .requestMatchers(new AntPathRequestMatcher(LinkToController.MAPPING + "/**", HttpMethod.GET.name())).permitAll()
                         .anyRequest().hasRole("ADMIN")
                 )
