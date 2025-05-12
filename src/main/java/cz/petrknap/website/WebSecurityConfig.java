@@ -29,6 +29,7 @@ public class WebSecurityConfig {
         return http.authorizeHttpRequests(
                 requests -> requests
                         .requestMatchers("/error", "/ping").permitAll()
+                        .requestMatchers("/favicon/*.ico", "/*/favicon.ico").permitAll()
                         .requestMatchers("/404/**").permitAll() // fake route to render 404 for reverse proxy
                         .requestMatchers(new AntPathRequestMatcher(BackupsController.MAPPING + "/*/freshness", HttpMethod.GET.name())).permitAll()
                         .requestMatchers(new AntPathRequestMatcher(BackupsController.MAPPING + "/*/freshness", HttpMethod.HEAD.name())).permitAll()
