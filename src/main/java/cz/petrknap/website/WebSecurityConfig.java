@@ -50,16 +50,14 @@ public class WebSecurityConfig {
     public UserDetailsService userDetailsService(ServletRequest request) {
         return new UsernameToRequestInjectingUserDetailsService(
                 request,
-                new ThrottledUserDetailsService(
-                        new InMemoryUserDetailsManager(
-                                config.users().stream().map(user -> User
-                                        .withDefaultPasswordEncoder()
-                                        .username(user.username())
-                                        .password(user.password())
-                                        .roles(user.roles().stream().map(String::toUpperCase).toArray(String[]::new))
-                                        .build()
-                                ).toArray(UserDetails[]::new)
-                        )
+                new InMemoryUserDetailsManager(
+                        config.users().stream().map(user -> User
+                                .withDefaultPasswordEncoder()
+                                .username(user.username())
+                                .password(user.password())
+                                .roles(user.roles().stream().map(String::toUpperCase).toArray(String[]::new))
+                                .build()
+                        ).toArray(UserDetails[]::new)
                 )
         );
     }
