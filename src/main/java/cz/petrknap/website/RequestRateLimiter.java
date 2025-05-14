@@ -3,7 +3,7 @@ package cz.petrknap.website;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,22 +18,26 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestRateLimiter extends OncePerRequestFilter {
-    private final Semaphore authorizationRequestSemaphore;
-    private final Timer timer = new Timer();
+    private static final int ONE_MINUTE_MS = 60 * 1000;
+
+    private final AtomicInteger authorizationRequestsPerMinute = new AtomicInteger(0);
+    private final Config.RequestRateLimiter config;
 
     public RequestRateLimiter(Config config) {
-        authorizationRequestSemaphore = new Semaphore(config.requestRateLimiter().authorizationRequestsPerMinute());
+        this.config = config.requestRateLimiter();
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                authorizationRequestsPerMinute.set(0);
+            }
+        }, ONE_MINUTE_MS, ONE_MINUTE_MS);
     }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             if (request.getHeader("Authorization") != null) {
-                acquireForMinute(authorizationRequestSemaphore);
+                acquire(authorizationRequestsPerMinute, config.authorizationRequestsPerMinute());
             }
             filterChain.doFilter(request, response);
         } catch (LimitExceeded ignored) {
@@ -41,16 +45,10 @@ public class RequestRateLimiter extends OncePerRequestFilter {
         }
     }
 
-    private void acquireForMinute(Semaphore semaphore) throws LimitExceeded {
-        if (!semaphore.tryAcquire()) {
+    private static void acquire(AtomicInteger counter, Integer limit) throws LimitExceeded {
+        if (counter.updateAndGet(count -> count == Integer.MAX_VALUE ? count : count + 1) > limit) {
             throw new LimitExceeded();
         }
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                semaphore.release();
-            }
-        }, 60000);
     }
 
     private static class LimitExceeded extends Exception {
