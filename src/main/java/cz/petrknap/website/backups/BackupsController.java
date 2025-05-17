@@ -4,6 +4,7 @@ import cz.petrknap.website.JpaCrudController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Tag(name = "backups")
 public class BackupsController extends JpaCrudController<Metadata, String> {
     public static final String MAPPING = "/backups";
+    public static final Integer ONE_HOUR_IN_SECONDS = 60 * 60;
 
     private final MetadataRepository metadataRepository;
 
@@ -25,12 +27,13 @@ public class BackupsController extends JpaCrudController<Metadata, String> {
     @GetMapping("/{id}/freshness")
     @ApiResponse(responseCode = "204", description = "Fresh")
     @ApiResponse(responseCode = "404")
-    @ApiResponse(responseCode = "500", description = "Not Fresh")
+    @ApiResponse(responseCode = "503", description = "Not Fresh")
     public ResponseEntity<Void> checkFreshness(@PathVariable String id) {
         Metadata backup = metadataRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        return ResponseEntity
-                .status(backup.isFresh() ? HttpStatus.NO_CONTENT : HttpStatus.INTERNAL_SERVER_ERROR)
+        return backup.isFresh() ? ResponseEntity.noContent().build() : ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .header(HttpHeaders.RETRY_AFTER, ONE_HOUR_IN_SECONDS.toString())
                 .build();
     }
 
