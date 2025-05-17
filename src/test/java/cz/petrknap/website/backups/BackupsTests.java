@@ -37,7 +37,7 @@ class BackupsTests extends JpaCrudControllerTests<Metadata, String> {
     @Test
     void checksFreshness() throws Exception {
         mvc.perform(get(BackupsController.MAPPING + "/" + entityId + "/freshness"))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isServiceUnavailable())
         ;
 
         Metadata backup = repository.findById(entityId).orElseThrow();

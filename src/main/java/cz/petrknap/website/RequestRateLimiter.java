@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -18,7 +19,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestRateLimiter extends OncePerRequestFilter {
-    private static final int ONE_MINUTE_MS = 60 * 1000;
+    private static final Integer ONE_MINUTE_IN_SECONDS = 60;
+    private static final Integer ONE_MINUTE_IN_MILLISECONDS = ONE_MINUTE_IN_SECONDS * 1000;
 
     private final AtomicInteger authorizationRequestsPerMinute = new AtomicInteger(0);
     private final Config.RequestRateLimiter config;
@@ -30,7 +32,7 @@ public class RequestRateLimiter extends OncePerRequestFilter {
             public void run() {
                 authorizationRequestsPerMinute.set(0);
             }
-        }, ONE_MINUTE_MS, ONE_MINUTE_MS);
+        }, ONE_MINUTE_IN_MILLISECONDS, ONE_MINUTE_IN_MILLISECONDS);
     }
 
     @Override
@@ -41,6 +43,7 @@ public class RequestRateLimiter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (LimitExceeded ignored) {
+            response.addHeader(HttpHeaders.RETRY_AFTER, ONE_MINUTE_IN_SECONDS.toString());
             response.sendError(HttpStatus.TOO_MANY_REQUESTS.value());
         }
     }
